@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Util.fs" />
+    <Compile Include="Files.fs" />
+    <Compile Include="Refs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

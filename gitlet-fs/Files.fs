@@ -83,9 +83,9 @@ let rec rmEmptyDirs path =
 // string.  It returns `undefined` if the file doesn't exist.
 let read path =
     if System.IO.File.Exists(path) then
-        Some (System.IO.File.ReadAllText(path))
+        System.IO.File.ReadAllText(path)
     else
-        None
+        failwith "read: file does not exist: " + path
 
 // **lsRecursive()** returns a list of all the files found in a
 // recursive search of `path`.

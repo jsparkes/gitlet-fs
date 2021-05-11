@@ -3,49 +3,69 @@
 // **gitletPath()** returns a string made by concatenating `path` to
 // the absolute path of the `.gitlet` directory of the repository.
 let gitletPath (path: string) =
-  let rec gitletDir dir =
-      if System.IO.Directory.Exists dir then
-          let potentialConfigFile = System.IO.Path.Join([|dir; "config"|])
-          let potentialGitletPath = System.IO.Path.Join([|dir; ".gitlet"|])
-          if System.IO.File.Exists(potentialConfigFile) then
-              //fs.statSync(potentialConfigFile).isFile() &&
-              let contents = System.IO.File.ReadAllText(potentialConfigFile)
-              if Util.matches "\[core\]" contents then
-                  dir
-              else
-                  failwith (dir + "/" + "config exists but is not a gitlet config file")
-          else if System.IO.File.Exists(potentialGitletPath) then
-              potentialGitletPath
-          else if (dir <> "/") then
-              gitletDir (System.IO.Path.Join([|dir; ".."|]))
-          else
-              ""
-      else
-          ""
+    let rec gitletDir dir =
+        if System.IO.Directory.Exists dir then
+            let potentialConfigFile = System.IO.Path.Join([| dir; "config" |])
 
-  let gDir = gitletDir (System.IO.Directory.GetCurrentDirectory())
-  if gDir <> "" then
-    System.IO.Path.Join([|gDir; path|])
-  else
-    failwith "gitlet dir not found"
+            let potentialGitletPath =
+                System.IO.Path.Join([| dir; ".gitlet" |])
+
+            if System.IO.File.Exists(potentialConfigFile) then
+                //fs.statSync(potentialConfigFile).isFile() &&
+                let contents =
+                    System.IO.File.ReadAllText(potentialConfigFile)
+
+                if Util.matches "\[core\]" contents then
+                    dir
+                else
+                    failwith (
+                        dir
+                        + "/"
+                        + "config exists but is not a gitlet config file"
+                    )
+            else if System.IO.File.Exists(potentialGitletPath) then
+                potentialGitletPath
+            else if (dir <> "/") then
+                gitletDir (System.IO.Path.Join([| dir; ".." |]))
+            else
+                ""
+        else
+            ""
+
+    let gDir =
+        gitletDir (System.IO.Directory.GetCurrentDirectory())
+
+    if gDir <> "" then
+        System.IO.Path.Join([| gDir; path |])
+    else
+        failwith "gitlet dir not found"
 
 // **inRepo()** returns true if the current working directory is
 // inside a repository.
-let inRepo = gitletPath(".") <> ""
+let inRepo = gitletPath (".") <> ""
 
 // **assertInRepo()** throws if the current working directory is not
 // inside a repository.
 let assertInRepo =
-  not (inRepo) && failwith "not a gitlet repository"
+    not (inRepo) && failwith "not a gitlet repository"
 
 // **workingCopyPath()** returns a string made by concatenating `path` to
 // the absolute path of the root of the repository.
 let workingCopyPath path =
-    System.IO.Path.Join([|System.IO.Path.Join([|gitletPath("."); ".."|]); path |])
+    System.IO.Path.Join(
+        [| System.IO.Path.Join([| gitletPath ("."); ".." |])
+           path |]
+    )
 
 // **pathFromRepoRoot()** returns `path` relative to the repo root
 let pathFromRepoRoot path =
-  System.IO.Path.GetRelativePath(workingCopyPath ".", System.IO.Path.Join([|System.IO.Directory.GetCurrentDirectory(); path|]))
+    System.IO.Path.GetRelativePath(
+        workingCopyPath ".",
+        System.IO.Path.Join(
+            [| System.IO.Directory.GetCurrentDirectory()
+               path |]
+        )
+    )
 
 // **write()** writes `content` to file at `path`, overwriting
 // anything that is already there.
@@ -74,8 +94,11 @@ let write path content =
 // inside `path`.
 let rec rmEmptyDirs path =
     if System.IO.Directory.Exists(path) then
-        let dirs = System.IO.Directory.EnumerateDirectories(path)
-        dirs |> Seq.iter (fun dir -> rmEmptyDirs path) 
+        let dirs =
+            System.IO.Directory.EnumerateDirectories(path)
+
+        dirs |> Seq.iter (fun dir -> rmEmptyDirs path)
+
         if (Seq.isEmpty dirs) then
             System.IO.Directory.Delete(path)
 
@@ -91,13 +114,11 @@ let read path =
 // recursive search of `path`.
 let rec lsRecursive path =
     if System.IO.File.Exists path then
-        [path]
+        [ path ]
     else if System.IO.Directory.Exists path then
         System.IO.Directory.EnumerateFileSystemEntries(path)
         |> Seq.toList
-        |> List.fold (fun l entry -> 
-                        List.append l (lsRecursive (System.IO.Path.Join([|path; entry|]))))
-                     List.empty
+        |> List.fold (fun l entry -> List.append l (lsRecursive (System.IO.Path.Join(path, entry)))) List.empty
     else
         List.empty
 

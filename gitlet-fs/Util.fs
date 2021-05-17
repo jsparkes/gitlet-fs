@@ -97,3 +97,23 @@ let matches r s =
 let replace r (replacement: string) str =
     let rx = Regex(r)
     rx.Replace(str, replacement)
+
+// **gitletRoot()** returns the absolute path of the `.gitlet` directory of the repository.
+let gitletRoot =
+    let rec gitletDir dir =
+        if System.IO.Directory.Exists dir then
+            let gitletPath =
+                System.IO.Path.Join([| dir; ".gitlet" |])
+
+            if System.IO.Directory.Exists(gitletPath) then
+                Some gitletPath
+            else if (dir <> "/") then
+                gitletDir (System.IO.Path.Join([| dir; ".." |]))
+            else
+                None
+        else
+            None
+
+    match gitletDir (System.IO.Directory.GetCurrentDirectory()) with
+    | Some dir -> dir
+    | None -> failwith "Util.gitletRoot: not in a gitlet repository"

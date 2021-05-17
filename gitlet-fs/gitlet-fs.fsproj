@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <Compile Include="Util.fs" />
+    <Compile Include="Objects.fs" />
     <Compile Include="Files.fs" />
+    <Compile Include="Index.fs" />
     <Compile Include="Refs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

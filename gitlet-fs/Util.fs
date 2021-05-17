@@ -4,26 +4,29 @@ open System.Security.Cryptography
 open System.Text
 open System.Text.RegularExpressions
 
-let private byteToHex (bytes:byte[]) =
-    bytes |> Array.fold (fun state x-> state + sprintf "%02X" x) ""
+let private byteToHex (bytes: byte []) =
+    bytes
+    |> Array.fold (fun state x -> state + sprintf "%02X" x) ""
 
 // Git uses SHA1 internally.
 // Gitlet uses a custom hash function
-let hash (str:string) =
+let hash (str: string) =
     use sha1 = new SHA1Managed()
+
     str
-        |> Encoding.UTF8.GetBytes
-        |> sha1.ComputeHash
-        |> byteToHex
+    |> Encoding.UTF8.GetBytes
+    |> sha1.ComputeHash
+    |> byteToHex
 
 // Gitlet version of hash.
 let hashGitlet (str: string) =
     let mutable hashInt = 0
     // Does this handle overflow correctly compared to javascript?
     // We would like to be compatible with gitlet.js
-    str 
-        |> Encoding.UTF8.GetBytes
-        |> Array.iter (fun c -> hashInt <- hashInt * 31 + int c)
+    str
+    |> Encoding.UTF8.GetBytes
+    |> Array.iter (fun c -> hashInt <- hashInt * 31 + int c)
+
     sprintf "%x" (System.Math.Abs hashInt)
 
 //data FileMap
@@ -53,11 +56,11 @@ let hashGitlet (str: string) =
 //       _ -> do
 //         obj <- setIn Object.empty (Array.tail arr)
 //         pure $ map Object.insert (Array.unsafeIndex arr 0) obj
-// setIn obj arr = 
+// setIn obj arr =
 //     case Array.head $ Array.keys of
-//     Just key -> 
+//     Just key ->
 //     // There should only be a single key in the object.
-//     maybe obj (\key -> 
+//     maybe obj (\key ->
 //                     case Array.length 2 of
 //                     2 -> Some $ Object.insert key arr[1] obj
 //                     ) $ Array.head $ Array.keys
@@ -77,7 +80,7 @@ let lines (str: string) =
 // Do we need to preserve order?
 // unique :: forall t. Ord t => Array t -> Array t
 // unique arr = Array.fromFoldable $ HashSet.fromFoldable arr
-// unique array = Array.foldr (\val acc -> case Array.find (==) val of 
+// unique array = Array.foldr (\val acc -> case Array.find (==) val of
 //     Just x -> Array.empty
 //     Nothing -> val :: acc) array
 // unique: function(arr) {

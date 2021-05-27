@@ -94,6 +94,15 @@ let matches r s =
     let rx = Regex(r)
     (rx.Match s).Success
 
+// Return the first group matched or an empty string
+let matchGet r s =
+    let rx = Regex(r)
+    let m = rx.Match s
+    if m.Success then
+        m.Groups.[1].Value
+    else
+        ""
+
 let replace r (replacement: string) str =
     let rx = Regex(r)
     rx.Replace(str, replacement)

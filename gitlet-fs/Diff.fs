@@ -55,7 +55,7 @@ let private keys (map: Map<string, 'v>) =
 // used as the base.  The base is only passed when getting the diff
 // for a merge.  This is the only time the conflict status might be
 // used.
-let tocDiff (receiver: Map<string, DiffEntry>) (giver: Map<string, DiffEntry>) (inBase: Map<string, DiffEntry>) =
+let tocDiff (receiver: Map<string, string>) (giver: Map<string, string>) (inBase: Map<string, string>) =
 
     // fileStatus() takes three strings that represent different
     // versions of the content of a file.  It returns the change that
@@ -106,9 +106,9 @@ let tocDiff (receiver: Map<string, DiffEntry>) (giver: Map<string, DiffEntry>) (
             Map.add
                 k
                 { Status = fileStatus receiver giver bse
-                  Receiver = receiver.[k].Receiver
-                  Bse = bse.[k].Bse
-                  Giver = giver.[k].Giver }
+                  Receiver = receiver.[k]
+                  Bse = bse.[k]
+                  Giver = giver.[k] }
                 container)
         Map.empty<string, DiffEntry>
 
@@ -135,17 +135,18 @@ let diff hash1 hash2 =
 // **nameStatus()** takes a diff and returns a map
 // from file paths to file statuses.
 let nameStatus (dif: Map<string, DiffEntry>) =
-    Map.filter (fun k v -> v.Status <> FILE_STATUS_SAME)
+    dif |> Map.filter (fun k v -> v.Status <> FILE_STATUS_SAME)
     |> Map.fold (fun container k v -> Map.add k v.Status container) Map.empty<string, string>
-
 
 // **changedFilesCommitWouldOverwrite()** gets a list of files
 // changed in the working copy.  It gets a list of the files that
 // are different in the head commit and the commit for the passed
 // hash.  It returns a list of paths that appear in both lists.
 let changedFilesCommitWouldOverwrite hash =
-    let headHash = Refs.hash "HEAD"
-    Set.intersect keys (nameStatus (diff headHash "")) keys (nameStatus (diff headHash hash))
+    match Refs.hash "HEAD" with
+    | Some headHash ->
+        Set.intersect (keys (nameStatus (diff headHash ""))) (keys (nameStatus (diff headHash hash)))
+    | None -> Set.empty
 
 // **addedOrModifiedFiles()** returns a list of files that have been
 // added to or modified in the working copy since the last commit.
@@ -161,7 +162,6 @@ let addedOrModifiedFiles =
         else
             Map.empty
 
-    let wc =
-        nameStatus (tocDiff headToc (index.workingCopyToc))
-
-    keys wc |> Set.filter (fun _ v -> v <> FILE_STATUS_DELETE)
+    nameStatus (tocDiff headToc (Index.workingCopyToc) Map.empty)
+    |> Map.filter (fun _ v -> v <> FILE_STATUS_DELETE)
+    |> Map.fold (fun container k v -> Set.add k container) Set.empty

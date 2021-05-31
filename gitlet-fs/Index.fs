@@ -19,7 +19,7 @@ let read =
 
     if System.IO.File.Exists(indexFilePath) then
         Files.read indexFilePath
-        |> Util.lines
+        |> Util.linesw
         |> Array.fold
             (fun container line ->
                 let blobData = line.Split(' ')

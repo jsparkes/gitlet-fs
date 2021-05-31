@@ -10,8 +10,11 @@
     <Compile Include="Util.fs" />
     <Compile Include="Objects.fs" />
     <Compile Include="Files.fs" />
+    <Compile Include="Config.fs" />
     <Compile Include="Index.fs" />
     <Compile Include="Refs.fs" />
+    <Compile Include="Diff.fs" />
+    <Compile Include="Merge.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

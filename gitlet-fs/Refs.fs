@@ -80,7 +80,8 @@ let hash refOrHash =
         else if exists terminalRef then
             Files.read (Files.gitletPath terminalRef) |> Some
         else
-            failwith "illegal state in hash:" + refOrHash
+            //failwith "illegal state in hash:" + refOrHash
+            None
 
 let isCheckedOut branch =
     not (Config.isBare) && headBranchName = branch

@@ -91,9 +91,9 @@ let tocDiff (receiver: Map<string, string>) (giver: Map<string, string>) (inBase
 
     // Get an array of all the paths in all the versions.
     let paths =
-        Set.unionMany [| keys receiver
-                         keys bse
-                         keys giver |]
+        Set.unionMany [| Util.keys receiver
+                         Util.keys bse
+                         Util.keys giver |]
 
     paths
     |> Set.fold
@@ -140,7 +140,7 @@ let nameStatus (dif: Map<string, DiffEntry>) =
 let changedFilesCommitWouldOverwrite hash =
     match Refs.hash "HEAD" with
     | Some headHash ->
-        Set.intersect (keys (nameStatus (diff headHash ""))) (keys (nameStatus (diff headHash hash)))
+        Set.intersect (Util.keys (nameStatus (diff headHash ""))) (Util.keys (nameStatus (diff headHash hash)))
     | None -> Set.empty
 
 // **addedOrModifiedFiles()** returns a list of files that have been

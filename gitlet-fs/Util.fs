@@ -126,3 +126,8 @@ let gitletRoot =
     match gitletDir (System.IO.Directory.GetCurrentDirectory()) with
     | Some dir -> dir
     | None -> failwith "Util.gitletRoot: not in a gitlet repository"
+
+// let keys<'k, 'v when 'k : comparison> (map : Map<'k, 'v>) =
+let keys (map: Map<string, 'v>) =
+    map
+    |> Map.fold (fun s k _ -> Set.add k s) Set.empty

@@ -42,11 +42,6 @@ let FILE_STATUS_SAME = "SAME"
 [<Literal>]
 let FILE_STATUS_CONFLICT = "CONFLICT"
 
-// let keys<'k, 'v when 'k : comparison> (map : Map<'k, 'v>) =
-let private keys (map: Map<string, 'v>) =
-    map
-    |> Map.fold (fun s k _ -> Set.add k s) Set.empty
-
 // **tocDiff()** takes three JS objects that map file paths to
 // hashes of file content.  It returns a diff between `receiver` and
 // `giver` (see the module description for the format).  `base` is
